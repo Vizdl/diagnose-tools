@@ -71,9 +71,13 @@ bool symbol_parser::load_pid_maps(int pid)
         start = end = offset = 0;
         exename[0] = '\0';
         sscanf(buf, "%lx-%lx %*s %lx %*x:%*x %*u %s %*s\n", &start, &end, &offset, exename);
+        // printf("exename[%s] start[%lx] end[%lx] offset[%lx]\n", exename, start, end, offset);
         if (exename[0] == '\0') {
             strcpy(exename, "[anon]");
         }
+        /**
+         * 创建 vma,并将其插入到 machine_vma
+         */
         vma vm(start, end, offset, exename);
         it->second.insert(std::make_pair(vm.start, vm));
     }
@@ -251,6 +255,9 @@ bool symbol_parser::load_elf(const elf_file &file)
     if (it != file_symbols.end()) {
         return true;
     }
+    /**
+     * 获取 elf 文件符号
+     */
     if (get_symbol_in_elf(syms, file.filename.c_str())) {
         file_symbols.insert(make_pair(file, std::move(syms)));
         return true;
@@ -292,8 +299,10 @@ bool symbol_parser::get_symbol_info(int pid, symbol &sym, elf_file &file)
     if (area.name == "[anon]") {
         file.type = JIT_TYPE;
     }
+    // 根据解析结果设置代码段的真实 elf 文件名
     file.reset(area.name);
     if (file.type != JIT_TYPE) {
+        /* 将虚拟地址设置为相对地址 */
         sym.reset(area.map(sym.ip));
     }
     return true;
@@ -308,6 +317,10 @@ bool symbol_parser::find_elf_symbol(symbol &sym, const elf_file &file, int pid, 
     it = file_symbols.find(file);
     std::set<symbol> ss;
     if (it == file_symbols.end()) {
+        /**
+        * 如若找不到则加载了再继续找,这里并非仅会加载运行的 elf 文件
+        * 还会加载该 elf 依赖的 so 库
+        */
         if (!load_elf(file)) {
             return false;
         }

@@ -138,6 +138,7 @@ void diag_printf_kern_stack(struct diag_kern_stack_detail *kern_stack, int rever
 			if (kern_stack->stack[i] == (size_t)-1 || kern_stack->stack[i] == 0) {
 				continue;
 			}
+			// 通过地址找符号
 			sym.reset(kern_stack->stack[i]);
 			if (g_symbol_parser.find_kernel_symbol(sym)) {
 				printf("#@        0x%lx %s ([kernel.kallsyms])\n",
@@ -248,6 +249,9 @@ void diag_printf_user_stack(int pid, int ns_pid, const char *comm,
 	diag_printf_user_stack(pid, ns_pid, comm, user_stack, 1);
 }
 
+/**
+ * 动态库找到每条堆栈都会回调
+ */
 static int unwind_frame_callback(struct unwind_entry *entry, void *arg)
 {
     symbol sym;

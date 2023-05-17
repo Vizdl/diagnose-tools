@@ -161,10 +161,17 @@ static int irq_delay_extract(void *buf, unsigned int len, void *)
 				detail->task.pid,
 				seq);
 		diag_printf_kern_stack(&detail->kern_stack);
+#ifdef DL_DBG
 		diag_printf_user_stack(detail->task.tgid,
 				detail->task.container_tgid,
 				detail->task.comm,
 				&detail->user_stack);
+#else
+		diag_printf_raw_stack(detail->task.tgid,
+				detail->task.container_tgid,
+				detail->task.comm,
+				&detail->raw_stack);
+#endif
 		printf("#*        0xffffffffffffff %s (UNKNOWN)\n",
 				detail->task.comm);
 		printf("##\n");

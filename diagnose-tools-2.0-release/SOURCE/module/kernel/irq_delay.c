@@ -68,8 +68,11 @@ void irq_delay_timer(struct diag_percpu_context *context)
 		do_gettimeofday(&detail->tv);
 		diag_task_brief(current, &detail->task);
 		diag_task_kern_stack(current, &detail->kern_stack);
+#ifdef DL_DBG
 		diag_task_user_stack(current, &detail->user_stack);
-
+#else
+		diag_task_raw_stack(current, &detail->raw_stack);
+#endif
 		diag_variant_buffer_reserve(&irq_delay_variant_buffer, sizeof(struct irq_delay_detail));
 		diag_variant_buffer_write_nolock(&irq_delay_variant_buffer, detail, sizeof(struct irq_delay_detail));
 		diag_variant_buffer_seal(&irq_delay_variant_buffer);

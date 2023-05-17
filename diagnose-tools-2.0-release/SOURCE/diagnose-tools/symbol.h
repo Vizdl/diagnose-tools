@@ -132,11 +132,25 @@ static inline bool operator==(const vma &lhs, const vma &rhs) {
 
 class symbol_parser {
 private:
+    /**
+     * 表示 vma 集合,为了方便查找使用map, key 是 vma start addr
+     */
     typedef std::map<size_t, vma> proc_vma;
-
+    /**
+     * elf 可执行文件符号对应
+     */
     std::map<elf_file, std::set<symbol> > file_symbols;
+    /**
+     * java 文件符号对应
+     */
     std::map<int, std::set<symbol> > java_symbols;
+    /**
+     * 内核符号集合
+     */
     std::set<symbol> kernel_symbols;
+    /**
+     * 机器的 vma 集合 : key(pid) value(该进程所有的vma)
+     */
     std::map<int, proc_vma> machine_vma;
     std::set<int> java_procs;
 public:
@@ -144,9 +158,15 @@ public:
     std::set<int>& get_java_procs() { return java_procs; }
 
     bool find_kernel_symbol(symbol &sym);
+    /**
+     * 通过 elf 文件信息与 sym 相对地址获取到符号名
+     */
     bool find_elf_symbol(symbol &sym, const elf_file &file, int pid, int pid_ns);
     bool find_java_symbol(symbol &sym, int pid, int pid_ns);
-
+    /**
+     * 通过 vma 偏移量获取 sym 相对地址
+     * 通过 vma 区域名获取 elf 真实文件路径
+     */
     bool get_symbol_info(int pid, symbol &sym, elf_file &file);
 
     bool find_vma(pid_t pid, vma &vm);

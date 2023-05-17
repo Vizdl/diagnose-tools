@@ -606,7 +606,9 @@ static int entry(u64 ip, int pid, int pid_ns, unwind_entry_cb_t cb, void *arg)
 	e.ip = ip;
 	e.pid = pid;
     e.pid_ns = pid_ns;
-
+	/**
+	 * 调用回调函数
+	 */
 	return cb(&e, arg);
 }
 

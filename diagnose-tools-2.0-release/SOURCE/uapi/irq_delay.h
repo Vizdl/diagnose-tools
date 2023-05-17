@@ -28,6 +28,7 @@ struct irq_delay_detail {
 	struct diag_task_detail task;
 	struct diag_kern_stack_detail kern_stack;
 	struct diag_user_stack_detail user_stack;
+	struct diag_raw_stack_detail  raw_stack;
 };
 
 #define CMD_IRQ_DELAY_SET (0)

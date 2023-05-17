@@ -763,6 +763,9 @@ void diag_task_raw_stack(struct task_struct *tsk, struct diag_raw_stack_detail *
 	detail->sp = sp;
 	detail->ip = ip;
 	detail->bp = bp;
+	/*
+	 * 拷贝用户态数据栈
+	 */
 	stack = (char *)&detail->stack[0];
 	for (i = 0; i < (DIAG_USER_STACK_SIZE / 1024); i++) {
 		if (tsk == current) {
